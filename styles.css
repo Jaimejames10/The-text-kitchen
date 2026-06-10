@@ -1,0 +1,159 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #faa8d9 0%, #d4e7f3 50%, #f88787 100%);
+
+  min-height: 100vh;
+  margin: 0;
+  padding: 30px;
+
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.header {
+  margin-bottom: 60px;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  /* text-align:center; */
+  margin-bottom: 30px;
+  color: #272013;
+}
+
+.drop-zone {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 3px dashed #3b82f6;
+  border-radius: 16px;
+  padding: 50px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.drop-zone.dragover {
+  background: #dbeafe;
+  border-color: #2563eb;
+}
+
+.drop-zone p {
+  margin: 10px 0;
+  color: #374151;
+}
+
+.btn {
+  display: inline-block;
+  background: #2563eb;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #1d4ed8;
+}
+
+.output {
+  display: flex;
+  padding: 20px;
+}
+
+.info {
+  margin-top: 20px;
+  /* background: white; */
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    background: rgba(255, 255, 255, 0.771);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.info p {
+  margin: 5px 0;
+}
+
+.buttons {
+  margin-top: 20px;
+  margin-left: 20px;
+  display: flex;
+  align-items: start;
+  gap: 8px;
+}
+
+button {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+#downloadTxt {
+  background: #10b981;
+  color: white;
+}
+
+#downloadTxt:hover {
+  background: #059669;
+}
+
+#downloadIcccm {
+  background: #7c3aed;
+  color: white;
+}
+
+#downloadIcccm:hover {
+  background: #6d28d9;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+textarea {
+  margin-top: 15px;
+  width: 100%;
+  height: 400px;
+  resize: none;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  font-family: Consolas, monospace;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+footer {
+  margin-top: 40px;
+  text-align: center;
+  color: #272013;
+  font-weight: bold;
+}
+
+footer a {
+  color: #2563eb;
+  text-decoration: none;
+}
