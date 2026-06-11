@@ -15,13 +15,18 @@ body {
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
 .header {
-  margin-bottom: 30px;
+  margin-bottom: 60px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  padding: 0 20px;
   gap: 1rem;
-  padding: 10px 20px;
+  align-items: center;
 }
 
 .logo-container {
@@ -57,69 +62,76 @@ h1 {
   background: rgba(255, 255, 255, 0.4);
 }
 
-.container {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(50px);
-  -webkit-backdrop-filter: blur(12px);
-  max-width: 1000px;
-  margin: auto;
-  border-radius: 5px;
-}
-
-/* h1{
-    text-align:center;
-    margin-bottom:20px;
-} */
-
 .drop-zone {
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(50px);
   -webkit-backdrop-filter: blur(12px);
   border: 3px dashed #3b82f6;
-  border-radius: 15px;
+  border-radius: 16px;
   padding: 50px;
   text-align: center;
+  transition: 0.3s;
+}
+
+.drop-zone.dragover {
+  background: #dbeafe;
+  border-color: #2563eb;
+}
+
+.drop-zone p {
+  margin: 10px 0;
+  color: #374151;
 }
 
 .btn {
+  display: inline-block;
   background: #2563eb;
   color: white;
   padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.status,
-.summary {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.371);
-  backdrop-filter: blur(80px);
-  -webkit-backdrop-filter: blur(12px);
-  
-  margin-top: 20px;
-  padding: 20px;
   border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-#agencyList {
-  list-style: none;
+.btn:hover {
+  background: #1d4ed8;
 }
 
-#agencyList li {
-  margin: 8px 0;
+.output {
+  display: flex;
+  padding: 20px;
+}
+
+.info {
+  margin-top: 20px;
+  /* background: white; */
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  background: rgba(255, 255, 255, 0.771);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.info p {
+  margin: 5px 0;
 }
 
 .buttons {
   margin-top: 20px;
+  margin-left: 20px;
   display: flex;
-  gap: 10px;
+  align-items: start;
+  gap: 8px;
 }
 
 button {
-  padding: 12px 20px;
   border: none;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 15px;
 }
 
 #downloadTxt {
@@ -127,13 +139,34 @@ button {
   color: white;
 }
 
+#downloadTxt:hover {
+  background: #059669;
+}
+
 #downloadIcccm {
   background: #7c3aed;
   color: white;
 }
 
+#downloadIcccm:hover {
+  background: #6d28d9;
+}
+
 button:disabled {
   background: #9ca3af;
+  cursor: not-allowed;
+}
+
+textarea {
+  margin-top: 15px;
+  width: 100%;
+  height: 400px;
+  resize: none;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  font-family: Consolas, monospace;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 footer {

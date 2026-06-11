@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Cocina del texto</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="kitche.webp" type="image/webp">
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo-container">
+          <img src="kitche.webp" alt="Logo" class="logo">
+          <h1>La Cocina del texto</h1>
+        </div>
+        <div class="logo-container">
+            <a class="link" href="./multiple_files/index.html">Avanzado</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+
+        <div id="drop-zone" class="drop-zone">
+            <p>📂 Arrastra tu archivo aquí</p>
+            <p>o</p>
+
+            <label class="btn">
+                Seleccionar archivo
+                <input type="file" id="fileInput" hidden>
+            </label>
+        </div>
+
+        <div class="output">
+            <div class="info">
+                <p><strong>Archivo:</strong> <span id="fileName">Ninguno</span></p>
+                <p><strong>Registros:</strong> <span id="lineCount">0</span></p>
+            </div>
+    
+            <div class="buttons">
+    
+                <button id="downloadTxt" disabled>
+                    Descargar TXT
+                </button>
+    
+                <button id="downloadIcccm" disabled>
+                    Descargar ICCCM
+                </button>
+    
+            </div>
+
+        </div>
+
+        <h3>Vista previa</h3>
+
+        <textarea id="preview" readonly></textarea>
+
+    </div>
+
+    <footer>
+        <p>Desarrollado por <a href="https://github.com/Jaimejames10" target="_blank">JAC</a></p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+</html>
