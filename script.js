@@ -1,275 +1,314 @@
-const dropZone = document.getElementById("drop-zone");
+const processingOrder = [
+    "av_comarapa",
+    "comarapa",
+    "saipina",
+    "san_isidro",
+    "los_negros",
+    "santa_cruz",
+    "omereque",
+    "cochabamba",
+];
+
+const officeRules = {
+    comarapa: {
+        code: "10",
+        office: "OF. CENTRAL"
+    },
+
+    saipina: {
+        code: "11",
+        office: "AGENCIA SAIPINA"
+    },
+
+    san_isidro: {
+        code: "12",
+        office: "AGENCIA SAN ISIDRO"
+    },
+
+    los_negros: {
+        code: "13",
+        office: "AGENCIA LOS NEGROS"
+    },
+
+    santa_cruz: {
+        code: "14",
+        office: "AGENCIA SANTA CRUZ"
+    },
+
+    omereque: {
+        code: "15",
+        office: "OF. EXTERNA OMEREQUE"
+    },
+
+    cochabamba: {
+        code: "16",
+        office: "AGENCIA COCHABAMBA"
+    },
+
+    av_comarapa: {
+        code: "19",
+        office: "AGENCIA AV. COMARAPA"
+    }
+};
+
+let processedFiles = {};
+
+const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 
-const preview = document.getElementById("preview");
-const fileName = document.getElementById("fileName");
-const lineCount = document.getElementById("lineCount");
+const totalRecords =
+    document.getElementById("totalRecords");
 
-const downloadTxt = document.getElementById("downloadTxt");
-const downloadIcccm = document.getElementById("downloadIcccm");
+const agencyList =
+    document.getElementById("agencyList");
 
-let convertedContent = "";
-let originalName = "";
+const downloadTxt =
+    document.getElementById("downloadTxt");
 
+const downloadIcccm =
+    document.getElementById("downloadIcccm");
 
-// ==========================
-// Drag & Drop
-// ==========================
+renderAgencyStatus();
 
-dropZone.addEventListener("dragover", (e) => {
+dropZone.addEventListener("dragover", e => {
     e.preventDefault();
-    dropZone.classList.add("dragover");
 });
 
-dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("dragover");
-});
-
-dropZone.addEventListener("drop", (e) => {
+dropZone.addEventListener("drop", e => {
 
     e.preventDefault();
 
-    dropZone.classList.remove("dragover");
-
-    const file = e.dataTransfer.files[0];
-
-    if(file){
-        processFile(file);
-    }
+    handleFiles(
+        Array.from(e.dataTransfer.files)
+    );
 
 });
 
-fileInput.addEventListener("change", (e) => {
+fileInput.addEventListener("change", e => {
 
-    const file = e.target.files[0];
-
-    if(file){
-        processFile(file);
-    }
+    handleFiles(
+        Array.from(e.target.files)
+    );
 
 });
 
+async function handleFiles(files){
 
-// ==========================
-// Procesamiento
-// ==========================
+    processedFiles = {};
 
-// function processFile(file){
+    let total = 0;
 
-//     originalName = file.name;
+    for(const file of files){
 
-//     fileName.textContent = file.name;
+        const office =
+            detectOffice(file.name);
 
-//     const reader = new FileReader();
-
-//     reader.onload = function(event){
-
-//         const content = event.target.result;
-
-//         const lines = content
-//             .split(/\r?\n/)
-//             .filter(line => line.trim() !== '');
-
-//         // lineCount.textContent = lines.length;
-
-//         // convertedContent = lines.map(line => {
-
-//         //     return line
-//         //         .split(',')
-//         //         .map(field => `"${field.trim()}"`)
-//         //         .join(',');
-
-//         // }).join('\n');
-
-//         const officeRules = {
-//             omereque: {
-//                 code: "15",
-//                 office: "OFICINA EXTERNA OMEREQUE"
-//             },
-//             mizque: {
-//                 code: "16",
-//                 office: "OFICINA EXTERNA MIZQUE"
-//             },
-//             aiquile: {
-//                 code: "17",
-//                 office: "OFICINA EXTERNA AIQUILE"
-//             }
-//         };
-
-//         const isOmereque = file.name
-//     .toLowerCase()
-//     .includes("omereque");
-
-// convertedContent = lines.map((line, index) => {
-
-//     const columns = line.split(',');
-
-//     if(columns.length !== 8){
-//         return null;
-//     }
-
-//     // Regla especial para archivos de Omereque
-//     if(isOmereque){
-
-//         columns[2] = "15"; // columna 3
-
-//         columns[4] = "OFICINA EXTERNA OMEREQUE"; // columna 5
-
-//     }
-
-//     return columns
-//         .map(field => `"${field.trim()}"`)
-//         .join(',');
-
-// })
-// .filter(line => line !== null)
-// .join('\n');
-
-//         preview.value = convertedContent;
-
-//         downloadTxt.disabled = false;
-//         downloadIcccm.disabled = false;
-
-//     };
-
-//     reader.readAsText(file);
-
-// }
-
-function processFile(file) {
-
-    originalName = file.name;
-
-    fileName.textContent = file.name;
-
-    const officeRules = {
-        omereque: {
-            code: "15",
-            office: "OF. EXTERNA OMEREQUE"
-        },
-        saipina: {
-            code: "11",
-            office: "AGENCIA SAIPINA"
-        },
-        avenida: {
-            code: "19",
-            office: "AGENCIA AV. COMARAPA"
+        if(!office){
+            continue;
         }
-    };
 
-    const reader = new FileReader();
+        const content =
+            await readFile(file);
 
-    reader.onload = function (event) {
-
-        const content = event.target.result;
-
-        const lines = content
+        let lines = content
             .split(/\r?\n/)
-            .filter(line => line.trim() !== '');
+            .filter(line => line.trim());
 
-        let validas = 0;
-        let invalidas = 0;
-        let errores = [];
+        // eliminar encabezado
+        lines = lines.slice(1);
 
-        const fileNameLower = file.name.toLowerCase();
+        const processedLines = [];
 
-        convertedContent = lines.map((line, index) => {
+        for(const line of lines){
 
             const columns = line.split(',');
 
-            // Validar cantidad de columnas
-            if (columns.length !== 8) {
-
-                invalidas++;
-
-                errores.push(
-                    `Línea ${index + 1}: ${columns.length} columnas`
-                );
-
-                return null;
+            if(columns.length !== 8){
+                continue;
             }
 
-            validas++;
+            const rule =
+                officeRules[office];
 
-            // Aplicar reglas según el nombre del archivo
-            for (const officeKey in officeRules) {
+            columns[2] = rule.code;
+            columns[4] = rule.office;
 
-                if (fileNameLower.includes(officeKey)) {
+            processedLines.push(
 
-                    columns[2] = officeRules[officeKey].code;
-                    columns[4] = officeRules[officeKey].office;
+                columns
+                    .map(v => `"${v.trim()}"`)
+                    .join(',')
 
-                    break;
-                }
-            }
+            );
 
-            return columns
-                .map(field => `"${field.trim()}"`)
-                .join(',');
+            total++;
 
-        })
-        .filter(line => line !== null)
-        .join('\n');
-
-        // Estadísticas
-        lineCount.textContent = validas;
-
-        // Mostrar sólo las primeras 100 líneas
-        preview.value = convertedContent
-            .split('\n')
-            .slice(0, 100)
-            .join('\n');
-
-        // Si tienes un textarea para errores
-        const erroresElement = document.getElementById("errores");
-
-        if (erroresElement) {
-
-            erroresElement.value = errores.length
-                ? errores.join('\n')
-                : 'Sin errores';
         }
 
-        downloadTxt.disabled = false;
-        downloadIcccm.disabled = false;
+        processedFiles[office] =
+            processedLines;
 
-        console.log(`Válidas: ${validas}`);
-        console.log(`Inválidas: ${invalidas}`);
+    }
 
-    };
+    totalRecords.textContent = total;
 
-    reader.readAsText(file);
+    renderAgencyStatus();
+
+    validateFiles();
+
 }
 
+function normalizeFilename(filename){
 
-// ==========================
-// Descargas
-// ==========================
+    return filename
+        .toLowerCase()
+        .replace(/\s+/g, "_")
+        .replace(/[\-\.]+/g, "_")
+        .replace(/[^a-z0-9_]/g, "");
+}
 
-function downloadFile(extension){
+function detectOffice(filename){
 
-    const blob = new Blob(
-        [convertedContent],
-        {type:'text/plain'}
-    );
+    const normalizedFile =
+        normalizeFilename(filename);
 
-    const link = document.createElement("a");
+    const compactFile =
+        normalizedFile.replace(/_/g, "");
 
-    link.href = URL.createObjectURL(blob);
+    for(const office of processingOrder){
 
-    const baseName = originalName.replace(/\.[^/.]+$/, "");
+        const compactOffice =
+            office.replace(/_/g, "");
 
-    link.download = `${baseName}_convertido.${extension}`;
+        if(
+            normalizedFile.includes(office) ||
+            compactFile.includes(compactOffice)
+        ){
+            return office;
+        }
+    }
+
+    return null;
+}
+
+function readFile(file){
+
+    return new Promise(resolve => {
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            e => resolve(e.target.result);
+
+        reader.readAsText(file);
+
+    });
+
+}
+
+function renderAgencyStatus(){
+
+    agencyList.innerHTML = "";
+
+    processingOrder.forEach(office => {
+
+        const li =
+            document.createElement("li");
+
+        li.innerHTML =
+            processedFiles[office]
+                ? `🟢 ${office}`
+                : `🔴 ${office}`;
+
+        agencyList.appendChild(li);
+
+    });
+
+}
+
+function validateFiles(){
+
+    const missing =
+        processingOrder.filter(
+            office => !processedFiles[office]
+        );
+
+    const ok =
+        missing.length === 0;
+
+    downloadTxt.disabled = !ok;
+    downloadIcccm.disabled = !ok;
+
+}
+
+function buildFinalContent(){
+
+    const finalProcessingOrder = [
+        "comarapa",
+        "saipina",
+        "san_isidro",
+        "los_negros",
+        "santa_cruz",
+        "omereque",
+        "cochabamba",
+        "av_comarapa",
+    ];
+
+    const finalLines = [];
+
+    finalProcessingOrder.forEach(office => {
+
+        if(processedFiles[office]){
+
+            finalLines.push(
+                ...processedFiles[office]
+            );
+
+        }
+
+    });
+
+    return finalLines.join("\n");
+
+}
+
+function download(extension){
+
+    const content =
+        buildFinalContent();
+
+    const blob =
+        new Blob(
+            [content],
+            {type:"text/plain"}
+        );
+
+    const link =
+        document.createElement("a");
+
+    link.href =
+        URL.createObjectURL(blob);
+
+    const now =
+        new Date()
+            .toISOString()
+            .slice(0,10)
+            .replaceAll("-","");
+
+    link.download =
+        `Consolidado_ICCCM_${now}.${extension}`;
 
     link.click();
 
-    URL.revokeObjectURL(link.href);
 }
 
-downloadTxt.addEventListener("click", () => {
-    downloadFile("txt");
-});
+downloadTxt.addEventListener(
+    "click",
+    () => download("txt")
+);
 
-downloadIcccm.addEventListener("click", () => {
-    downloadFile("ICCCM");
-});
+downloadIcccm.addEventListener(
+    "click",
+    () => download("ICCCM")
+);
