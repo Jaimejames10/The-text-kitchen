@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Kitchen</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="../kitche.webp" type="image/webp">
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <img src="../kitche.webp" alt="Logo" class="logo">
+            <h1>La Cocina del texto</h1>
+        </div>
+        <div class="logo-container">
+            <a class="link" href="../index.html">Volver</a>
+        </div>
+    </header>
+    <div class="container">
+
+        <div id="dropZone" class="drop-zone">
+
+            <h2>Arrastra aquí los archivos</h2>
+
+            <p>o</p>
+
+            <label class="btn">
+                Seleccionar Archivos
+                <input type="file" id="fileInput" multiple hidden>
+            </label>
+
+        </div>
+
+        <div class="status">
+
+            <h3>Estado de Agencias</h3>
+
+            <ul id="agencyList"></ul>
+
+        </div>
+
+        <div class="summary">
+
+            <p>Total registros: <span id="totalRecords">0</span></p>
+
+        </div>
+
+        <div class="buttons">
+
+            <button id="downloadTxt" disabled>
+                Descargar TXT
+            </button>
+
+            <button id="downloadIcccm" disabled>
+                Descargar ICCCM
+            </button>
+
+        </div>
+
+    </div>
+
+     <footer>
+        <p>Desarrollado por <a href="https://github.com/Jaimejames10" target="_blank">JAC</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
