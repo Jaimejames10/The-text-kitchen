@@ -40,6 +40,17 @@
                 <p><strong>Registros:</strong> <span id="lineCount">0</span></p>
             </div>
     
+            <div class="format-options">
+                <label class="format-option active">
+                    <input type="radio" name="format" value="quoted" checked>
+                    Con comillas
+                </label>
+                <label class="format-option">
+                    <input type="radio" name="format" value="plain">
+                    Sin comillas
+                </label>
+            </div>
+
             <div class="buttons">
     
                 <button id="downloadTxt" disabled>
@@ -48,6 +59,10 @@
     
                 <button id="downloadIcccm" disabled>
                     Descargar ICCCM
+                </button>
+    
+                <button id="downloadExcel" disabled>
+                    Descargar Excel
                 </button>
     
             </div>
@@ -63,6 +78,7 @@
     <footer>
         <p>Desarrollado por <a href="https://github.com/Jaimejames10" target="_blank">JAC</a></p>
     </footer>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="script.js"></script>
 </body>
 

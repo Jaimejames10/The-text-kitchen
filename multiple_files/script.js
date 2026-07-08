@@ -52,6 +52,7 @@ const officeRules = {
 };
 
 let processedFiles = {};
+let useQuotes = true;
 
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
@@ -67,6 +68,12 @@ const downloadTxt =
 
 const downloadIcccm =
     document.getElementById("downloadIcccm");
+
+const downloadExcel =
+    document.getElementById("downloadExcel");
+
+const formatRadios =
+    document.querySelectorAll('input[name="format"]');
 
 renderAgencyStatus();
 
@@ -134,11 +141,7 @@ async function handleFiles(files){
             columns[4] = rule.office;
 
             processedLines.push(
-
-                columns
-                    .map(v => `"${v.trim()}"`)
-                    .join(',')
-
+                columns.map(v => v.trim())
             );
 
             total++;
@@ -239,6 +242,7 @@ function validateFiles(){
 
     downloadTxt.disabled = !ok;
     downloadIcccm.disabled = !ok;
+    downloadExcel.disabled = !ok;
 
 }
 
@@ -262,7 +266,9 @@ function buildFinalContent(){
         if(processedFiles[office]){
 
             finalLines.push(
-                ...processedFiles[office]
+                ...processedFiles[office].map(row =>
+                    row.map(field => useQuotes ? `"${field}"` : field).join(',')
+                )
             );
 
         }
@@ -303,6 +309,20 @@ function download(extension){
 
 }
 
+formatRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+
+        document.querySelectorAll(".format-option").forEach(el => {
+            el.classList.remove("active");
+        });
+
+        radio.closest(".format-option").classList.add("active");
+
+        useQuotes = radio.value === "quoted";
+
+    });
+});
+
 downloadTxt.addEventListener(
     "click",
     () => download("txt")
@@ -312,3 +332,63 @@ downloadIcccm.addEventListener(
     "click",
     () => download("ICCCM")
 );
+
+function formatDate(value) {
+
+    if (typeof value !== "string") return value;
+
+    const parts = value.split(/[-\/]/);
+
+    if (parts.length === 3) {
+
+        let [a, b, c] = parts;
+
+        if (a.length === 4) {
+
+            return `${c}/${b}/${a}`;
+        }
+
+        return `${a}/${b}/${c}`;
+    }
+
+    return value;
+}
+
+downloadExcel.addEventListener("click", () => {
+
+    if (typeof XLSX === "undefined") return;
+
+    const dateCols = new Set([1, 3]);
+
+    const allData = [];
+
+    const order = [
+        "comarapa", "saipina", "san_isidro",
+        "los_negros", "santa_cruz", "omereque",
+        "cochabamba", "av_comarapa"
+    ];
+
+    order.forEach(office => {
+        if (processedFiles[office]) {
+            allData.push(
+                ...processedFiles[office].map(row =>
+                    row.map((cell, i) => dateCols.has(i) ? formatDate(cell) : cell)
+                )
+            );
+        }
+    });
+
+    const header = ["CODENVIO", "FECHACORTE", "CODPAF", "FECHAATENCION", "DESCRIPCIONPAF", "TOTALFICHASCAJA", "NAC", "N30"];
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([header, ...allData]);
+    XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+    const now = new Date()
+        .toISOString()
+        .slice(0, 10)
+        .replaceAll("-", "");
+
+    XLSX.writeFile(wb, `Consolidado_ICCCM_${now}.xlsx`);
+
+});

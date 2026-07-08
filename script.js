@@ -7,9 +7,14 @@ const lineCount = document.getElementById("lineCount");
 
 const downloadTxt = document.getElementById("downloadTxt");
 const downloadIcccm = document.getElementById("downloadIcccm");
+const downloadExcel = document.getElementById("downloadExcel");
+
+const formatRadios = document.querySelectorAll('input[name="format"]');
 
 let convertedContent = "";
 let originalName = "";
+let useQuotes = true;
+let parsedData = [];
 
 
 // ==========================
@@ -173,11 +178,12 @@ function processFile(file) {
 
         const fileNameLower = file.name.toLowerCase();
 
-        convertedContent = lines.map((line, index) => {
+        parsedData = [];
+
+        lines.forEach((line, index) => {
 
             const columns = line.split(',');
 
-            // Validar cantidad de columnas
             if (columns.length !== 8) {
 
                 invalidas++;
@@ -186,12 +192,11 @@ function processFile(file) {
                     `Línea ${index + 1}: ${columns.length} columnas`
                 );
 
-                return null;
+                return;
             }
 
             validas++;
 
-            // Aplicar reglas según el nombre del archivo
             for (const officeKey in officeRules) {
 
                 if (fileNameLower.includes(officeKey)) {
@@ -203,22 +208,10 @@ function processFile(file) {
                 }
             }
 
-            return columns
-                .map(field => `"${field.trim()}"`)
-                .join(',');
+            parsedData.push(columns.map(field => field.trim()));
+        });
 
-        })
-        .filter(line => line !== null)
-        .join('\n');
-
-        // Estadísticas
-        lineCount.textContent = validas;
-
-        // Mostrar sólo las primeras 100 líneas
-        preview.value = convertedContent
-            .split('\n')
-            .slice(0, 100)
-            .join('\n');
+        applyFormat();
 
         // Si tienes un textarea para errores
         const erroresElement = document.getElementById("errores");
@@ -232,6 +225,7 @@ function processFile(file) {
 
         downloadTxt.disabled = false;
         downloadIcccm.disabled = false;
+        downloadExcel.disabled = false;
 
         console.log(`Válidas: ${validas}`);
         console.log(`Inválidas: ${invalidas}`);
@@ -241,6 +235,48 @@ function processFile(file) {
     reader.readAsText(file);
 }
 
+
+// ==========================
+// Formato (comillas / sin comillas)
+// ==========================
+
+function applyFormat() {
+
+    convertedContent = parsedData
+        .map(row => row
+            .map(field => useQuotes ? `"${field}"` : field)
+            .join(',')
+        )
+        .join('\n');
+
+    // Estadísticas
+    lineCount.textContent = parsedData.length;
+
+    // Mostrar sólo las primeras 100 líneas
+    preview.value = convertedContent
+        .split('\n')
+        .slice(0, 100)
+        .join('\n');
+
+}
+
+formatRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+
+        document.querySelectorAll(".format-option").forEach(el => {
+            el.classList.remove("active");
+        });
+
+        radio.closest(".format-option").classList.add("active");
+
+        useQuotes = radio.value === "quoted";
+
+        if (parsedData.length) {
+            applyFormat();
+        }
+
+    });
+});
 
 // ==========================
 // Descargas
@@ -272,4 +308,47 @@ downloadTxt.addEventListener("click", () => {
 
 downloadIcccm.addEventListener("click", () => {
     downloadFile("ICCCM");
+});
+
+function formatDate(value) {
+
+    if (typeof value !== "string") return value;
+
+    const parts = value.split(/[-\/]/);
+
+    if (parts.length === 3) {
+
+        let [a, b, c] = parts;
+
+        if (a.length === 4) {
+
+            return `${c}/${b}/${a}`;
+        }
+
+        return `${a}/${b}/${c}`;
+    }
+
+    return value;
+}
+
+downloadExcel.addEventListener("click", () => {
+
+    if (typeof XLSX === "undefined") return;
+
+    const dateCols = new Set([1, 3]);
+
+    const data = parsedData.map(row =>
+        row.map((cell, i) => dateCols.has(i) ? formatDate(cell) : cell)
+    );
+
+    const header = ["CODENVIO", "FECHACORTE", "CODPAF", "FECHAATENCION", "DESCRIPCIONPAF", "TOTALFICHASCAJA", "NAC", "N30"];
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([header, ...data]);
+    XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+    const baseName = originalName.replace(/\.[^/.]+$/, "");
+
+    XLSX.writeFile(wb, `${baseName}_convertido.xlsx`);
+
 });

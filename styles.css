@@ -118,6 +118,32 @@ h1 {
   margin: 5px 0;
 }
 
+.format-options {
+  margin-top: 20px;
+  margin-left: 20px;
+  display: flex;
+  gap: 8px;
+}
+
+.format-option {
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.3);
+  transition: 0.3s;
+  user-select: none;
+}
+
+.format-option.active {
+  background: #2563eb;
+  color: white;
+}
+
+.format-option input {
+  display: none;
+}
+
 .buttons {
   margin-top: 20px;
   margin-left: 20px;
@@ -150,6 +176,15 @@ button {
 
 #downloadIcccm:hover {
   background: #6d28d9;
+}
+
+#downloadExcel {
+  background: #059669;
+  color: white;
+}
+
+#downloadExcel:hover {
+  background: #047857;
 }
 
 button:disabled {
